@@ -1,0 +1,4 @@
+[submodule "upm/Assets/Robotlegs"]
+	path = upm/Assets/Robotlegs
+	url = git@github.com:iDreamsOfGame/robotlegs-sharp-framework.git
+	branch = upm
