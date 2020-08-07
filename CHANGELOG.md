@@ -1,3 +1,12 @@
+# [0.10.1-alpha] - 2020-08-07
+
+
+## Fixed:
+
+- Fixed the bug that may cause memory leak when using **DirectAsyncCommandMap**.
+
+
+
 # [0.10.0-alpha] - 2020-06-21
 
 
