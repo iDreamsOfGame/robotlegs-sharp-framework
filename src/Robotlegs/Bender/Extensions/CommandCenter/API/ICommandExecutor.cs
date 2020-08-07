@@ -5,7 +5,9 @@
 //  in accordance with the terms of the license agreement accompanying it. 
 //------------------------------------------------------------------------------
 
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
+using Robotlegs.Bender.Framework.API;
 
 namespace Robotlegs.Bender.Extensions.CommandCenter.API
 {
@@ -17,6 +19,11 @@ namespace Robotlegs.Bender.Extensions.CommandCenter.API
 	/// </summary>
 	public interface ICommandExecutor
 	{
+		/// <summary>
+        /// The injector that this command executor created.
+        /// </summary>
+		IInjector Injector { get; }
+
 		/// <summary>
 		/// Execute a command for a given mapping
 		/// </summary>

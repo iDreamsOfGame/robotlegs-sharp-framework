@@ -42,9 +42,9 @@ namespace Robotlegs.Bender.Extensions.DirectAsyncCommand.Impl
         {
             IsAborted = false;
             _context = context;
-            _injector = injector;
             _handleResult = handleResult;
-            _commandExecutor = new CommandExecutor(injector, removeMapping, HandleCommandExecuteResult);
+            _commandExecutor = new CommandExecutor(injector, removeMapping, HandleCommandExecuteResult, PreprocessAsyncCommandExecuting);
+            _injector = _commandExecutor.Injector;
         }
 
         /*============================================================================*/
@@ -110,6 +110,9 @@ namespace Robotlegs.Bender.Extensions.DirectAsyncCommand.Impl
 
         private void ExecuteNextCommand()
         {
+            if (_injector.HasMapping<Action<IAsyncCommand, bool>>(AsyncCommandExecutedCallbackName))
+                _injector.Unmap<Action<IAsyncCommand, bool>>(AsyncCommandExecutedCallbackName);
+
             while (!IsAborted && _commandMappingQueue.Count > 0)
             {
                 ICommandMapping mapping = _commandMappingQueue.Dequeue();
@@ -118,11 +121,6 @@ namespace Robotlegs.Bender.Extensions.DirectAsyncCommand.Impl
                 {
                     _injector.Map<Action<IAsyncCommand, bool>>(AsyncCommandExecutedCallbackName).ToValue((Action<IAsyncCommand, bool>)CommandExecutedCallback);
                     _commandExecutor.ExecuteCommand(mapping, _payload);
-
-                    if (_injector.HasDirectMapping<Action<IAsyncCommand, bool>>(AsyncCommandExecutedCallbackName))
-                    {
-                        _injector.Unmap<Action<IAsyncCommand, bool>>(AsyncCommandExecutedCallbackName);
-                    }
                     return;
                 }
             }
@@ -138,14 +136,16 @@ namespace Robotlegs.Bender.Extensions.DirectAsyncCommand.Impl
             }
         }
 
-        private void HandleCommandExecuteResult(object result, object command, ICommandMapping CommandMapping)
+        private void PreprocessAsyncCommandExecuting(object command, ICommandMapping CommandMapping)
         {
             _currentAsyncCommand = command as IAsyncCommand;
+            _context.Detain(_currentAsyncCommand);
+        }
 
+        private void HandleCommandExecuteResult(object result, object command, ICommandMapping CommandMapping)
+        {
             if (_handleResult != null)
                 _handleResult.Invoke(result, command, CommandMapping);
-
-            _context.Detain(command);
         }
     }
 }

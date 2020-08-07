@@ -17,22 +17,32 @@ namespace Robotlegs.Bender.Extensions.CommandCenter.Impl
 	public class CommandExecutor : ICommandExecutor
 	{
 		/*============================================================================*/
-		/* Public Properties                                                          */
+		/* Public Fields                                                          */
 		/*============================================================================*/
 
 		public delegate void RemoveMappingDelegate(ICommandMapping CommandMapping);
 
+		public delegate void OnPreprocessCommandExecutingDelegate(object command, ICommandMapping CommandMapping);
+
 		public delegate void HandleResultDelegate(object result, object command, ICommandMapping CommandMapping);
 
 		/*============================================================================*/
-		/* Private Properties                                                         */
+		/* Private Fields                                                         */
 		/*============================================================================*/
 
 		private IInjector _injector;
 
 		private RemoveMappingDelegate _removeMapping;
 
+		private OnPreprocessCommandExecutingDelegate _onPreprocessCommandExecuting;
+
 		private HandleResultDelegate _handleResult;
+
+		/*============================================================================*/
+		/* Public Properties                                                          */
+		/*============================================================================*/
+
+		public IInjector Injector => _injector;
 
 		/*============================================================================*/
 		/* Constructor                                                                */
@@ -44,11 +54,13 @@ namespace Robotlegs.Bender.Extensions.CommandCenter.Impl
 		/// <param name="injector">The Injector to use. A child injector will be created from it.</param>
 		/// <param name="removeMapping">removeMapping Remove mapping handler (optional)</param>
 		/// <param name="handleResult">handleResult Result handler (optional)</param>
-		public CommandExecutor (IInjector injector, RemoveMappingDelegate removeMapping = null, HandleResultDelegate handleResult = null)
+		/// <param name="onPreprocessCommandExecuting">onPreprocessCommandExecuting Preprocess before executing command (optional)</param>
+		public CommandExecutor (IInjector injector, RemoveMappingDelegate removeMapping = null, HandleResultDelegate handleResult = null, OnPreprocessCommandExecutingDelegate onPreprocessCommandExecuting = null)
 		{
 			_injector = injector.CreateChild();
 			_removeMapping = removeMapping;
 			_handleResult = handleResult;
+			_onPreprocessCommandExecuting = onPreprocessCommandExecuting;
 		}
 
 		/*============================================================================*/
@@ -91,6 +103,9 @@ namespace Robotlegs.Bender.Extensions.CommandCenter.Impl
 
 			if (command != null && mapping.ExecuteMethod != null) 
 			{
+				if (_onPreprocessCommandExecuting != null)
+					_onPreprocessCommandExecuting.Invoke(command, mapping);
+
 				MethodInfo executeMethod = command.GetType().GetMethod (mapping.ExecuteMethod);
 				object result = (hasPayload && executeMethod.GetParameters ().Length > 0)
 					? executeMethod.Invoke (command, payload.Values.ToArray ())
