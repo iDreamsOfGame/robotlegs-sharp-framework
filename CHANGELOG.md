@@ -1,3 +1,12 @@
+# [0.10.2-alpha] - 2020-06-30
+
+
+## Added:
+
+- Added method **SetCommandExecutedCallback** to **DirectAsyncCommandMap**.
+
+
+
 # [0.10.1-alpha] - 2020-08-07
 
 
