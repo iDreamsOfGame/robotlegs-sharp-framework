@@ -24,8 +24,10 @@ namespace Robotlegs.Bender.Extensions.DirectAsyncCommand.Impl
 
         private ICommandExecutor _commandExecutor;
         private Queue<ICommandMapping> _commandMappingQueue;
+        private int _totalCommandsCount;
         private Action _commandsAbortedCallback;
         private Action _commandsExecutedCallback;
+        private Action<Type, int, int> _commandExecutedCallback;
         private IContext _context;
 
         private IAsyncCommand _currentAsyncCommand;
@@ -78,6 +80,7 @@ namespace Robotlegs.Bender.Extensions.DirectAsyncCommand.Impl
         public void ExecuteAsyncCommands(IEnumerable<ICommandMapping> mappings, CommandPayload payload)
         {
             _commandMappingQueue = new Queue<ICommandMapping>(mappings);
+            _totalCommandsCount = _commandMappingQueue.Count;
             _payload = payload;
             ExecuteNextCommand();
         }
@@ -92,6 +95,11 @@ namespace Robotlegs.Bender.Extensions.DirectAsyncCommand.Impl
             _commandsExecutedCallback = callback;
         }
 
+        public void SetCommandExecutedCallback(Action<Type, int, int> callback)
+        {
+            _commandExecutedCallback = callback;
+        }
+
         /*============================================================================*/
         /* Private Functions                                                           */
         /*============================================================================*/
@@ -99,6 +107,9 @@ namespace Robotlegs.Bender.Extensions.DirectAsyncCommand.Impl
         private void CommandExecutedCallback(IAsyncCommand command, bool stop = false)
         {
             _context.Release(command);
+
+            var current = _totalCommandsCount - _commandMappingQueue.Count;
+            _commandExecutedCallback?.Invoke(command.GetType(), current, _totalCommandsCount);
 
             if (stop)
             {

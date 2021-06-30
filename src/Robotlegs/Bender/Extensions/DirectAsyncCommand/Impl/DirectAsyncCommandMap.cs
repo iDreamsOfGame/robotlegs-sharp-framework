@@ -94,5 +94,11 @@ namespace Robotlegs.Bender.Extensions.DirectAsyncCommand.Impl
             _executor.SetCommandsExecutedCallback(callback);
             return this;
         }
+
+        public IDirectAsyncCommandMapper SetCommandExecutedCallback(Action<Type, int, int> callback)
+        {
+            _executor.SetCommandExecutedCallback(callback);
+            return this;
+        }
     }
 }

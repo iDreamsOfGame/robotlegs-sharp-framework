@@ -75,6 +75,18 @@ namespace Robotlegs.Bender.Extensions.DirectAsyncCommand.Impl
         }
 
         [Test]
+        public void command_executed()
+        {
+            var index = 0;
+            subject.SetCommandExecutedCallback((commandType, current, total) =>
+            {
+                index++;
+            });
+            subject.Map<NullAsyncCommand>().Map<NullAsyncCommand2>().Execute();
+            Assert.AreEqual(2, index);
+        }
+
+        [Test]
         public void commands_get_injected_with_DirectCommandMap_instance()
         {
             IDirectAsyncCommandMap actual = null;
