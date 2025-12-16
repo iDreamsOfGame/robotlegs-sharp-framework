@@ -317,21 +317,21 @@ namespace Robotlegs.Bender.Framework.Impl
 
 		public ILifecycle BeforeInitializing (Action handler)
 		{
-			ReportIfNotUnitialized();
+			ReportIfNotUninitialized();
 			_initialize.AddBeforeHandler(handler);
 			return this;
 		}
 
 		public ILifecycle BeforeInitializing (HandlerMessageDelegate handler)
 		{
-			ReportIfNotUnitialized();
+			ReportIfNotUninitialized();
 			_initialize.AddBeforeHandler(handler);
 			return this;
 		}
 
 		public ILifecycle BeforeInitializing (HandlerMessageCallbackDelegate handler)
 		{
-			ReportIfNotUnitialized();
+			ReportIfNotUninitialized();
 			_initialize.AddBeforeHandler(handler);
 			return this;
 		}
@@ -495,7 +495,7 @@ namespace Robotlegs.Bender.Framework.Impl
 			_destroy.postTransition += DispatchPostDestroy;
 		}
 
-		private void ReportIfNotUnitialized()
+		private void ReportIfNotUninitialized()
 		{
 			if (!Uninitialized)
 				ReportError(LifecycleException.LATE_HANDLER_ERROR_MESSAGE);

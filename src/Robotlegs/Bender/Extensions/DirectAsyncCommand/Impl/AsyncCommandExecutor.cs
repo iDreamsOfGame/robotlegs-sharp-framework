@@ -22,17 +22,17 @@ namespace Robotlegs.Bender.Extensions.DirectAsyncCommand.Impl
         /* Private Fields                                                         */
         /*============================================================================*/
 
-        private ICommandExecutor _commandExecutor;
+        private readonly ICommandExecutor _commandExecutor;
         private Queue<ICommandMapping> _commandMappingQueue;
         private int _totalCommandsCount;
         private Action _commandsAbortedCallback;
         private Action _commandsExecutedCallback;
         private Action<Type, int, int> _commandExecutedCallback;
-        private IContext _context;
+        private readonly IContext _context;
 
         private IAsyncCommand _currentAsyncCommand;
-        private CommandExecutor.HandleResultDelegate _handleResult;
-        private IInjector _injector;
+        private readonly CommandExecutor.HandleResultDelegate _handleResult;
+        private readonly IInjector _injector;
         private CommandPayload _payload;
 
         /*============================================================================*/
@@ -147,16 +147,23 @@ namespace Robotlegs.Bender.Extensions.DirectAsyncCommand.Impl
             }
         }
 
-        private void PreprocessAsyncCommandExecuting(object command, ICommandMapping CommandMapping)
+        private void PreprocessAsyncCommandExecuting(object command, ICommandMapping commandMapping)
         {
             _currentAsyncCommand = command as IAsyncCommand;
-            _context.Detain(_currentAsyncCommand);
+            if (_currentAsyncCommand != null)
+            {
+                _context.Detain(_currentAsyncCommand);
+            }
+            else
+            {
+                ExecuteNextCommand();
+            }
         }
 
-        private void HandleCommandExecuteResult(object result, object command, ICommandMapping CommandMapping)
+        private void HandleCommandExecuteResult(object result, object command, ICommandMapping commandMapping)
         {
             if (_handleResult != null)
-                _handleResult.Invoke(result, command, CommandMapping);
+                _handleResult.Invoke(result, command, commandMapping);
         }
     }
 }

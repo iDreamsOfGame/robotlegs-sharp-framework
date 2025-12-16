@@ -87,7 +87,7 @@ namespace Robotlegs.Bender.Extensions.DirectAsyncCommand.Impl
         }
 
         [Test]
-        public void commands_get_injected_with_DirectCommandMap_instance()
+        public void commands_get_injected_with_DirectAsyncCommandMap_instance()
         {
             IDirectAsyncCommandMap actual = null;
             injector.Map(typeof(Action<IDirectAsyncCommandMap>), "ReportingFunction").ToValue((Action<IDirectAsyncCommandMap>)delegate (IDirectAsyncCommandMap passed)
@@ -115,7 +115,7 @@ namespace Robotlegs.Bender.Extensions.DirectAsyncCommand.Impl
         }
 
         [Test]
-        public void map_creates_IOnceCommandConfig()
+        public void map_creates_IDirectAsyncCommandConfigurator()
         {
             Assert.That(subject.Map<NullAsyncCommand>(), Is.InstanceOf<IDirectAsyncCommandConfigurator>());
         }
